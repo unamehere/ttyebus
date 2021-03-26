@@ -193,7 +193,7 @@ static int IrqCounter = 0;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,19,42)
 #define RASPI_23_UART_IRQ      87
 #else
-#define RASPI_23_UART_IRQ      81
+#define RASPI_23_UART_IRQ      114
 #endif
 
 // PL011 UART register (16C650 type)
@@ -795,43 +795,7 @@ static long ttyebus_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 // ===============================================================================================
 unsigned int ttyebus_raspi_model(void)
     {
-    struct file* filp = NULL;
-    char buf[32];
-    unsigned int NumBytes = 0;
-
-    // get current segment descriptor, set segment descriptor
-    // associated to kernel space
-    // ======================================================
-    mm_segment_t old_fs = get_fs();
-    set_fs(KERNEL_DS);
-
-    // read the file
-    // =============
-    filp = filp_open("/sys/firmware/devicetree/base/model", O_RDONLY, 0);
-    if (filp == NULL)
-        {
-        set_fs(old_fs);
-        return 0;
-        }
-    NumBytes = filp->f_op->read(filp, buf, sizeof(buf), &filp->f_pos);
-    set_fs(old_fs);
-
-    // restore the segment descriptor
-    // ==============================
-    filp_close(filp, NULL);
-
-    // interpret the data from the file
-    // ================================
-    if (NumBytes < 14)
-        return 0;
-
-    switch(buf[13])
-        {
-        case '2' : return 2; break;
-        case '3' : return 3; break;
-        case '4' : return 4; break;
-        default: return 1;
-        }
+        return 3;
     }
 
 
